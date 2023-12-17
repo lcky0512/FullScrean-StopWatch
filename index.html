@@ -12,30 +12,34 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      height: 100vh;
+      height: 650px; /* Set the height of the mobile */
       margin: 0;
-      transition: background-color 0.3s ease;
+      padding: 10px;
+      box-sizing: border-box;
     }
 
-    #stopwatch {
+    .stopwatch {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
       text-align: center;
-      width: 100%;
     }
 
-    #display {
-      font-size: 4em;
+    .time-row {
+      font-size: 10em;
       margin-bottom: 20px;
     }
 
     #controls {
-      text-align: center;
-      width: 100%;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      margin-top: 20px;
     }
 
     button {
       padding: 10px 20px;
       font-size: 16px;
-      margin: 0 5px;
       cursor: pointer;
     }
 
@@ -50,50 +54,41 @@
       outline: none;
     }
 
-    .laps {
-      margin-top: 20px;
-      text-align: center;
-      width: 100%;
-    }
-
-    .lapTime {
-      margin: 5px;
-    }
-
     /* Additional styles for dark mode */
     body.dark-mode {
       background-color: #333;
       color: #fff;
     }
 
-    #stopwatch.dark-mode button {
+    button.dark-mode {
       background-color: #555;
+      color: #fff;
     }
   </style>
 </head>
 <body>
-  <div id="stopwatch" class="dark-mode">
-    <div id="display">00:00:00</div>
-    <div id="controls">
-      <button id="startStop">Start</button>
-      <button id="reset">Reset</button>
-      <button id="lap">Lap</button>
-      <button id="darkModeBtn">Dark Mode</button>
-    </div>
-    <div id="laps" class="laps"></div>
+  <div class="stopwatch">
+    <div class="time-row" id="hours">00</div>
+    <div class="time-row" id="minutes">00</div>
+    <div class="time-row" id="seconds">00</div>
+  </div>
+
+  <div id="controls">
+    <button id="startStop">Start</button>
+    <button id="reset">Reset</button>
+    <button id="darkModeBtn">Dark Mode</button>
   </div>
 
   <script>
     let timer;
     let isRunning = false;
-    let lapCount = 1;
 
-    const display = document.getElementById('display');
+    const hoursDisplay = document.getElementById('hours');
+    const minutesDisplay = document.getElementById('minutes');
+    const secondsDisplay = document.getElementById('seconds');
     const startStopBtn = document.getElementById('startStop');
     const resetBtn = document.getElementById('reset');
-    const lapBtn = document.getElementById('lap');
     const darkModeBtn = document.getElementById('darkModeBtn');
-    const lapsContainer = document.getElementById('laps');
 
     function startStop() {
       if (isRunning) {
@@ -109,39 +104,32 @@
     function reset() {
       clearInterval(timer);
       isRunning = false;
-      display.textContent = '00:00:00';
+      hoursDisplay.textContent = '00';
+      minutesDisplay.textContent = '00';
+      secondsDisplay.textContent = '00';
       startStopBtn.textContent = 'Start';
-      lapCount = 1;
-      lapsContainer.innerHTML = '';
-    }
-
-    function lap() {
-      const lapTime = document.createElement('div');
-      lapTime.classList.add('lapTime');
-      lapTime.textContent = `Lap ${lapCount}: ${display.textContent}`;
-      lapsContainer.appendChild(lapTime);
-      lapCount++;
     }
 
     function updateDisplay() {
-      const currentTime = display.textContent.split(':');
-      let hours = parseInt(currentTime[0]);
-      let minutes = parseInt(currentTime[1]);
-      let seconds = parseInt(currentTime[2]);
+      let hours = parseInt(hoursDisplay.textContent);
+      let minutes = parseInt(minutesDisplay.textContent);
+      let seconds = parseInt(secondsDisplay.textContent);
 
       seconds++;
 
       if (seconds === 60) {
         seconds = 0;
         minutes++;
+
+        if (minutes === 60) {
+          minutes = 0;
+          hours++;
+        }
       }
 
-      if (minutes === 60) {
-        minutes = 0;
-        hours++;
-      }
-
-      display.textContent = `${padZero(hours)}:${padZero(minutes)}:${padZero(seconds)}`;
+      hoursDisplay.textContent = padZero(hours);
+      minutesDisplay.textContent = padZero(minutes);
+      secondsDisplay.textContent = padZero(seconds);
     }
 
     function padZero(num) {
@@ -151,11 +139,12 @@
     darkModeBtn.addEventListener('click', toggleDarkMode);
     startStopBtn.addEventListener('click', startStop);
     resetBtn.addEventListener('click', reset);
-    lapBtn.addEventListener('click', lap);
 
     function toggleDarkMode() {
       document.body.classList.toggle('dark-mode');
-      document.getElementById('stopwatch').classList.toggle('dark-mode');
+      startStopBtn.classList.toggle('dark-mode');
+      resetBtn.classList.toggle('dark-mode');
+      darkModeBtn.classList.toggle('dark-mode');
     }
   </script>
 </body>
